@@ -9,7 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@prisma/config": "^7.8.0",
     "@tanstack/react-query": "^5.90.20",
+    "dotenv": "^17.4.2",
+    "mongodb": "^7.2.0",
     "next": "^16.1.6",
     "react": "19.2.1",
     "react-dom": "19.2.1"

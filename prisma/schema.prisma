@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+model Movie {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  showTime    DateTime
+  seats       Seat[]
+}
+
+model Seat {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  row         String    // e.g., "A", "B"
+  col         Int       // e.g., 1, 2
+  status      String    @default("AVAILABLE") // "AVAILABLE", "LOCKED", "BOOKED"
+  lockedUntil DateTime? // This is the magic concurrency field!
+  
+  movieId     String    @db.ObjectId
+  movie       Movie     @relation(fields: [movieId], references: [id])
+}
