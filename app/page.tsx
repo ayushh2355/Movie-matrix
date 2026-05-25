@@ -1,4 +1,4 @@
-
+import Link from "next/link";
 async function getMovies() {
 
   const res = await fetch("http://localhost:3000/api/movies", {
@@ -32,9 +32,12 @@ export default async function Home() {
               <p className="text-gray-600 mb-4">
                 <span className="font-semibold">Showtime:</span> {new Date(movie.showTime).toLocaleString()}
               </p>
-              <button className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                Book Seats
-              </button>
+             <Link 
+             href={`/movie/${movie.id}`} 
+               className="block w-full text-center bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                 Book Seats
+              </Link>
             </div>
           ))}
         </div>
