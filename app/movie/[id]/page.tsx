@@ -28,25 +28,17 @@ export default async function MoviePage(props: Props) {
   }
 
   return (
-    <main className="min-h-screen p-10 bg-gray-50 text-black">
-      <div className="max-w-4xl mx-auto">
-        
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-2 text-blue-600">{movie.title}</h1>
-          <p className="text-gray-600 font-medium">
-            Select your seats for {new Date(movie.showTime).toLocaleString()}
-          </p>
-        </div>
+    <main className="min-h-screen py-12 px-4 bg-slate-950 text-slate-100 flex items-center justify-center relative overflow-hidden">
+      {/* Ambient theater glow representing light from the screen */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[250px] bg-amber-500/10 blur-[150px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[120px] bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none" />
 
-        <div className="w-full h-12 bg-linear-to-b from-gray-300 to-gray-100 rounded-t-full shadow-inner mb-16 flex items-center justify-center border-b-4 border-gray-400">
-          <span className="text-gray-500 font-bold tracking-widest uppercase text-sm">
-            Screen
-          </span>
-        </div>
-
-       
-        <SeatGrid seats={movie.seats} />
-
+      <div className="max-w-5xl w-full relative z-10">
+        <SeatGrid 
+          seats={movie.seats} 
+          movieTitle={movie.title} 
+          showTime={movie.showTime} 
+        />
       </div>
     </main>
   );

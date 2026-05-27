@@ -11,6 +11,12 @@ model Movie {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   showTime    DateTime
+  posterUrl   String?
+  rating      Float?
+  votes       String?  // e.g. "7.1K"
+  genre       String?  // e.g. "Action, Drama"
+  language    String?  // e.g. "Hindi"
+  cert        String?  // e.g. "UA"
   seats       Seat[]
 }
 
