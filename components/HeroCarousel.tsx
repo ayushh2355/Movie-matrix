@@ -18,16 +18,17 @@ interface HeroCarouselProps {
 
 export default function HeroCarousel({ movies }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const movieCount = movies?.length || 0;
 
   useEffect(() => {
-    if (!movies || movies.length === 0) return;
+    if (movieCount === 0) return;
     
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % movies.length);
+      setCurrentSlide((prev) => (prev + 1) % movieCount);
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [movies.length, movies]);
+  }, [movieCount]); 
 
   const activeFeatured = movies[currentSlide];
 
@@ -46,8 +47,8 @@ export default function HeroCarousel({ movies }: HeroCarouselProps) {
         />
       ))}
 
-      <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-950/60 to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent z-10 pointer-events-none" />
 
       <div className="inset-0 flex flex-col justify-center px-6 md:px-16 space-y-2 md:space-y-3 max-w-xl md:max-w-2xl relative z-20 h-full">
         <div className="inline-flex items-center gap-2">
@@ -70,7 +71,7 @@ export default function HeroCarousel({ movies }: HeroCarouselProps) {
         <div className="pt-2">
           <Link 
             href={`/movie/${activeFeatured.id}`}
-            className="inline-block bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 text-xs font-black tracking-wider uppercase px-6 py-2.5 rounded-xl shadow-lg hover:shadow-amber-500/20 active:scale-95 transition-all"
+            className="inline-block bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 text-xs font-black tracking-wider uppercase px-6 py-2.5 rounded-xl shadow-lg hover:shadow-amber-500/20 active:scale-95 transition-all"
           >
             Book Tickets
           </Link>

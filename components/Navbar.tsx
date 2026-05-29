@@ -1,4 +1,7 @@
+"use client";
 import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";
+import UserDropdown from "@/components/UserDropdown";
 
 interface NavbarProps {
   searchQuery: string;
@@ -6,6 +9,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({ searchQuery, setSearchQuery }: NavbarProps) {
+  const { data: session } = useSession();
+
   return (
     <>
       <header className="bg-slate-900 border-b border-slate-800/80 sticky top-0 z-50 px-4 md:px-8 py-3.5 flex items-center justify-between">
@@ -36,10 +41,13 @@ export default function Navbar({ searchQuery, setSearchQuery }: NavbarProps) {
         </div>
 
         <div className="flex items-center gap-4">
-         
-          <button className="bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 text-[11px] font-black tracking-wider uppercase px-4 py-1.5 rounded-lg transition-all">
-            Sign In
-          </button>
+          {session?.user ? (
+            <UserDropdown user={session.user} />
+          ) : (
+            <button onClick={() => signIn("google")} className="bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 text-[11px] font-black tracking-wider uppercase px-4 py-1.5 rounded-lg transition-all">
+              Sign In
+            </button>
+          )}
         </div>
       </header>
 

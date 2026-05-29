@@ -22,11 +22,12 @@ export default async function TicketsPage() {
       seats: true,
       totalPrice: true,
       createdAt: true,
-      movie: {
-        select: { title: true, poster: true, genre: true }
-      },
       showtime: {
-        select: { datetime: true, theaterScreen: true }
+        select: { 
+          datetime: true, 
+          theaterScreen: true,
+          movie: { select: { title: true, posterUrl: true, genre: true } }
+        }
       }
     },
     orderBy: {

@@ -5,10 +5,13 @@ interface TicketCardProps {
     id: string;
     status: string;
     seats: string[];
-    totalPrice: number;
+    totalPrice: number | null;
     createdAt: Date;
-    movie: { title: string; poster: string | null; genre: string | null };
-    showtime: { datetime: Date; theaterScreen: string } | null;
+    showtime: { 
+      datetime: Date; 
+      theaterScreen: string | null;
+      movie: { title: string; posterUrl: string | null; genre: string | null };
+    } | null;
   };
 }
 
@@ -19,10 +22,10 @@ export default function TicketCard({ booking }: TicketCardProps) {
     <div className={`relative flex flex-col md:flex-row bg-slate-900/80 rounded-2xl md:rounded-3xl border ${isCancelled ? 'border-slate-800/40 opacity-70' : 'border-slate-800/80'} overflow-hidden shadow-2xl group transition-all`}>
       
       <div className="w-full md:w-48 h-64 md:h-auto shrink-0 relative bg-slate-950 border-b md:border-b-0 md:border-r border-dashed border-slate-700">
-        {booking.movie.poster ? (
+        {booking.showtime?.movie.posterUrl ? (
           <img 
-            src={booking.movie.poster} 
-            alt={booking.movie.title}
+            src={booking.showtime.movie.posterUrl} 
+            alt={booking.showtime.movie.title}
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${isCancelled ? 'grayscale opacity-50' : 'opacity-90 group-hover:opacity-100 group-hover:scale-105'}`}
           />
         ) : (
@@ -35,13 +38,13 @@ export default function TicketCard({ booking }: TicketCardProps) {
         <div>
           <div className="flex justify-between items-start mb-2">
             <h2 className={`text-2xl md:text-3xl font-black tracking-wide line-clamp-2 ${isCancelled ? 'text-slate-400 line-through decoration-rose-500/50' : 'text-slate-100'}`}>
-              {booking.movie.title}
+              {booking.showtime?.movie.title || "Unknown Movie"}
             </h2>
             <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shrink-0 ml-4 border ${isCancelled ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
               {booking.status}
             </span>
           </div>
-          <p className="text-sm font-semibold text-amber-500 mb-6">{booking.movie.genre || "Feature Film"}</p>
+          <p className="text-sm font-semibold text-amber-500 mb-6">{booking.showtime?.movie.genre || "Feature Film"}</p>
           
           <div className={`grid grid-cols-2 gap-y-6 gap-x-4 ${isCancelled ? 'opacity-50' : ''}`}>
             <div>

@@ -4,12 +4,12 @@ import { Movie } from "./MovieListClient";
 export default function MovieCard({ movie }: { movie: Movie }) {
   return (
     <div className="flex flex-col group">
-      <Link href={`/movie/${movie.id}`} className="relative aspect-2/3 w-full rounded-2xl overflow-hidden shadow-lg border border-slate-900 hover:border-slate-800/80 transition-all select-none">
+      <Link href={`/movie/${movie.id}`} className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-lg border border-slate-900 hover:border-slate-800/80 transition-all select-none">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
           style={{ backgroundImage: `url(${movie.posterUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=500"})` }}
         />
-        <div className="absolute bottom-0 inset-x-0 h-10 bg-slate-950/80 backdrop-blur-xs flex items-center justify-between px-3 border-t border-slate-900">
+        <div className="absolute bottom-0 inset-x-0 h-10 bg-slate-950/80 backdrop-blur-sm flex items-center justify-between px-3 border-t border-slate-900">
           <span className="text-[10px] font-black text-slate-300 flex items-center gap-1">
             <span className="text-amber-500 text-xs">★</span> {movie.rating || "N/A"}/10
           </span>

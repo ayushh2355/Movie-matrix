@@ -12,16 +12,33 @@ export type Seat = {
 };
 
 type SeatGridProps = {
-  seats: Seat[];
+  bookedSeatIds: string[];
   movieTitle: string;
   showTime: Date | string;
+  movieId: string;
+  showtimeId: string;
 };
 
-
-export default function SeatGrid({ seats, movieTitle, showTime }: SeatGridProps) {
+export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId, showtimeId }: SeatGridProps) {
   const router = useRouter();
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [booking, setBooking] = useState(false);
+
+  // Generate seats internally
+  const seats: Seat[] = [];
+  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  for (const row of rows) {
+    for (let col = 1; col <= 11; col++) {
+      if (col === 6) continue;
+      const seatId = `${row}${col}`;
+      seats.push({
+        id: seatId,
+        row,
+        col: col < 6 ? col : col - 1,
+        status: bookedSeatIds.includes(seatId) ? "BOOKED" : "AVAILABLE"
+      });
+    }
+  }
 
   const toggleSeat = (seatId: string) => {
     setSelectedSeats((prev) =>
@@ -62,7 +79,7 @@ export default function SeatGrid({ seats, movieTitle, showTime }: SeatGridProps)
       const res = await fetch("/api/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ seatIds: selectedSeats }),
+        body: JSON.stringify({ seatIds: selectedSeats, showtimeId, totalPrice }),
       });
 
       if (res.ok) {
