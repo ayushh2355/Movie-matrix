@@ -32,12 +32,11 @@ export default function MovieListClient({ initialMovies }: Props) {
   }, [initialMovies, searchQuery]);
 
   const featuredMovie = useMemo(() => {
-    return initialMovies.find((m) => m.title.includes("Pushpa 2")) || initialMovies[0];
+    return initialMovies.length > 0 ? initialMovies[0] : null;
   }, [initialMovies]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      
       
       <Navbar 
         searchQuery={searchQuery} 
@@ -46,9 +45,14 @@ export default function MovieListClient({ initialMovies }: Props) {
 
       {featuredMovie && (
         <section className="relative w-full aspect-[2.8/1] md:aspect-[3.5/1] overflow-hidden bg-slate-900 select-none">
+        
+         
           <div 
-            className="absolute inset-0 bg-cover bg-center filter brightness-[0.35] scale-105"
-            style={{ backgroundImage: `url(${featuredMovie.posterUrl})` }}
+            className="absolute inset-0 bg-cover filter brightness-[0.35] scale-105"
+            style={{ 
+              backgroundImage: `url(${featuredMovie.posterUrl})`,
+              backgroundPosition: "center 20%" 
+            }}
           />
           <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-950/70 to-transparent" />
           <div className="absolute inset-0 bg-linear-to-t from-slate-950 to-transparent" />
@@ -59,7 +63,7 @@ export default function MovieListClient({ initialMovies }: Props) {
                 Trending #1
               </span>
               <span className="text-[11px] font-bold text-slate-400">
-                ★ {featuredMovie.rating}/10 ({featuredMovie.votes} Votes)
+                ★ {featuredMovie.rating || "N/A"}/10 ({featuredMovie.votes || "0"} Votes)
               </span>
             </div>
             
@@ -68,7 +72,7 @@ export default function MovieListClient({ initialMovies }: Props) {
             </h1>
 
             <p className="text-xs text-slate-300 font-semibold hidden md:block">
-              {featuredMovie.genre} &bull; {featuredMovie.language} &bull; {featuredMovie.cert}
+              {[featuredMovie.genre, featuredMovie.language, featuredMovie.cert].filter(Boolean).join(" • ")}
             </p>
 
             <div className="pt-2">
@@ -86,7 +90,6 @@ export default function MovieListClient({ initialMovies }: Props) {
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-10 flex-1">
         <section className="w-full space-y-6">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3 select-none">
-          
             <h2 className="text-sm font-black tracking-wider uppercase text-slate-200">
               Now Showing
             </h2>

@@ -16,7 +16,7 @@ export default function Loading() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {[...Array(10)].map((_, i) => (
             <div key={i} className="flex flex-col gap-3 animate-pulse">
-              <div className="w-full aspect-[2/3] bg-slate-900/60 rounded-xl border border-slate-800/50" />
+              <div className="w-full aspect-2/3 bg-slate-900/60 rounded-xl border border-slate-800/50" />
               <div className="w-3/4 h-4 bg-slate-900/80 rounded-md" />
               <div className="w-1/2 h-3 bg-slate-800/80 rounded-md" />
             </div>

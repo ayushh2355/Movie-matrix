@@ -26,7 +26,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    // Verify the booking exists and belongs to the user
     const existingBooking = await prisma.booking.findUnique({
       where: { id: bookingId },
     });
@@ -43,7 +42,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Booking is already cancelled." }, { status: 400 });
     }
 
-    // Update status to CANCELLED
     const cancelledBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: { status: "CANCELLED" },

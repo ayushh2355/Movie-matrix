@@ -12,12 +12,32 @@ interface BookingSidebarProps {
   handleBooking: () => void;
 }
 
-export default function BookingSidebar({ movieTitle, showTime, selectedSeats, selectedSeatDetails, totalPrice, selectedTiersBreakdown, booking, handleBooking }: BookingSidebarProps) {
+export default function BookingSidebar({ 
+  movieTitle, 
+  showTime, 
+  selectedSeats, 
+  selectedSeatDetails, 
+  totalPrice, 
+  selectedTiersBreakdown, 
+  booking, 
+  handleBooking 
+}: BookingSidebarProps) {
+  
   const formatShowTime = (time: string | Date) => {
     try {
       return new Date(time).toLocaleString("en-US", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
     } catch { return String(time); }
   };
+
+  const canBook = selectedSeats.length > 0 && !booking;
+  
+  const baseClasses = "w-full py-3 rounded-xl font-black text-xs shadow-md transition-all duration-150 select-none uppercase tracking-wider border";
+  
+  const activeClasses = "bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 border-amber-400/30 hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] active:scale-[0.98] cursor-pointer";
+  
+  const disabledClasses = "bg-slate-900/50 text-slate-600 border-slate-800/80 cursor-not-allowed shadow-none";
+
+  const buttonClasses = `${baseClasses} ${canBook ? activeClasses : disabledClasses}`;
 
   return (
     <div className="w-full md:w-[350px] p-6 md:p-8 bg-slate-950/50 backdrop-blur-sm flex flex-col justify-between border-t md:border-t-0 border-slate-800/80">
@@ -66,7 +86,11 @@ export default function BookingSidebar({ movieTitle, showTime, selectedSeats, se
           </div>
         </div>
 
-        <button disabled={selectedSeats.length === 0 || booking} onClick={handleBooking} className={`w-full py-3 rounded-xl font-black text-xs shadow-md transition-all duration-150 select-none uppercase tracking-wider border ${selectedSeats.length > 0 && !booking ? "bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 border-amber-400/30 hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] active:scale-[0.98] cursor-pointer" : "bg-slate-900/50 text-slate-600 border-slate-800/80 cursor-not-allowed shadow-none"}`}>
+        <button 
+          disabled={!canBook} 
+          onClick={handleBooking} 
+          className={buttonClasses}
+        >
           {booking ? "Booking..." : "Book Now"}
         </button>
       </div>

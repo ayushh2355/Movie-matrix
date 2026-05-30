@@ -26,7 +26,7 @@ export default async function MoviePage(props: Props) {
     <main className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 md:px-8">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-8 md:gap-12">
         
-        {/* Left: Movie Poster */}
+        
         <div className="w-full md:w-5/12 lg:w-2/5 shrink-0">
           <div className="aspect-2/3 md:aspect-auto md:h-full w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-800 relative bg-slate-900 min-h-[450px]">
             {movie.posterUrl ? (
@@ -66,7 +66,7 @@ export default async function MoviePage(props: Props) {
             {movie.showtimes && movie.showtimes.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
                 {movie.showtimes.map((st) => (
-                  <div key={st.id} className="flex flex-col items-center justify-between bg-[#060913] border border-[#1e293b]/50 rounded-[2rem] py-10 px-8 shadow-2xl transition-all hover:border-[#1e293b] hover:shadow-black/50">
+                  <div key={st.id} className="flex flex-col items-center justify-between bg-[#060913] border border-[#1e293b]/50 rounded-4xl py-10 px-8 shadow-2xl transition-all hover:border-[#1e293b] hover:shadow-black/50">
                     <span className="text-xs font-bold uppercase tracking-[0.3em] mb-4 text-slate-400 text-center">
                       {st.theaterScreen || "Standard"}
                     </span>

@@ -24,7 +24,7 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [booking, setBooking] = useState(false);
 
-  // Generate seats internally
+ 
   const seats: Seat[] = [];
   const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   for (const row of rows) {
