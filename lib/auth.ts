@@ -19,7 +19,7 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
   ],
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
