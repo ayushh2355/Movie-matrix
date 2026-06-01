@@ -1,4 +1,5 @@
 // lib/data.ts
+
 export interface Seat {
   id: string;
   row: string;
@@ -6,19 +7,22 @@ export interface Seat {
   status: string;
 }
 
-export type Movie = {
+export type ApiMovie = {
   id: string;
   title: string;
-  rating: number;
-  votes: string;
-  posterUrl: string;
-  genre: string;
-  language: string;
-  cert: string;
-  showTime: Date;
+  rating: number | null;
+  votes: string | null;
+  posterUrl: string | null;
+  genre: string | null;
+  language: string | null;
+  cert: string | null;
 };
 
-export const moviesList: Movie[] = [
+
+// LOCAL FALLBACK DATA
+// This is Used when both the database AND the OMDb API are unreachable.
+
+export const moviesList: ApiMovie[] = [
   {
     id: "6a15ecd987c25a1316b784cb",
     title: "Pushpa 2: The Rule",
@@ -28,7 +32,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Drama",
     language: "Hindi, Telugu, Tamil",
     cert: "UA",
-    showTime: new Date("2026-05-25T23:30:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784cc",
@@ -39,7 +42,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Drama, Comedy",
     language: "Telugu, Hindi",
     cert: "U",
-    showTime: new Date("2026-05-26T12:00:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784cd",
@@ -50,7 +52,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Thriller",
     language: "Kannada, Hindi, Telugu",
     cert: "UA",
-    showTime: new Date("2026-05-26T15:30:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784ce",
@@ -61,7 +62,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Drama",
     language: "Telugu, Hindi, Tamil",
     cert: "UA",
-    showTime: new Date("2026-05-26T19:00:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784cf",
@@ -72,7 +72,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Thriller",
     language: "Telugu, Kannada, Hindi",
     cert: "UA16+",
-    showTime: new Date("2026-05-27T16:00:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784d0",
@@ -83,7 +82,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Fantasy, Drama",
     language: "Telugu, Tamil, Hindi",
     cert: "UA",
-    showTime: new Date("2026-05-27T19:30:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784d1",
@@ -94,7 +92,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Drama",
     language: "Telugu, Hindi, Tamil",
     cert: "UA",
-    showTime: new Date("2026-05-28T14:45:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784d2",
@@ -105,7 +102,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Sci-Fi",
     language: "Telugu, Hindi, Tamil",
     cert: "UA",
-    showTime: new Date("2026-05-28T18:00:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784d3",
@@ -116,7 +112,6 @@ export const moviesList: Movie[] = [
     genre: "Action, Sci-Fi",
     language: "English, Hindi",
     cert: "UA16+",
-    showTime: new Date("2026-05-28T21:30:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784d4",
@@ -127,7 +122,6 @@ export const moviesList: Movie[] = [
     genre: "Thriller, Drama",
     language: "Malayalam, Telugu",
     cert: "UA16+",
-    showTime: new Date("2026-05-29T14:30:00.000Z"),
   },
   {
     id: "6a15ecd987c25a1316b784d5",
@@ -138,9 +132,7 @@ export const moviesList: Movie[] = [
     genre: "Devotional, Drama",
     language: "Hindi, Telugu",
     cert: "U",
-    showTime: new Date("2026-05-29T18:00:00.000Z"),
   },
-
   {
     id: "6a15ecd987c25a1316b784d8",
     title: "Pati Patni Aur Woh 2",
@@ -150,12 +142,119 @@ export const moviesList: Movie[] = [
     genre: "Comedy, Romance",
     language: "Hindi",
     cert: "UA16+",
-    showTime: new Date("2026-05-31T16:45:00.000Z"),
   },
-
 ];
 
-export const featuredMovies = [
-  { id: "6a15ecd987c25a1316b784d2", title: "Kalki 2898 AD", genre: "Action, Sci-Fi • Telugu, Hindi, Tamil • UA", bgImage: "https://assets-in.bmscdn.com/iedb/movies/images/mobile/thumbnail/xlarge/kalki-2898-ad-et00352941-1718275859.jpg", rating: 9.1, votes: "310K" },
-  { id: "6a15ecd987c25a1316b784cf", title: "Salaar", genre: "Action, Thriller • Telugu, Kannada, Hindi • UA16+", bgImage: "https://assets-in.bmscdn.com/iedb/movies/images/mobile/thumbnail/xlarge/salaar-cease-fire--part-1-et00301886-1702971289.jpg", rating: 8.9, votes: "190K" },
+// ─────────────────────────────────────────────────────────────────────────────
+// OMDB INTEGRATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+const OMDB_IMDB_IDS: string[] = [
+  "tt16539454", // Pushpa: The Rule - Part 2
+  "tt21615164", // RRR (2022)
+  "tt12735488", // Kalki 2898 AD
+  "tt13927994", // Salaar
+  "tt27510174", // Stree 2
+  "tt12844910", // Pathaan
+  "tt15501640", // Drishyam 2
+  "tt23849204", // 12th Fail
+  "tt15354916", // Jawan
+  "tt18411490", // Tiger 3
+  "tt1394313",  // Brahmastra
+  "tt1745960",  // Top Gun: Maverick
+  "tt10872600", // Spider-Man: No Way Home
+  "tt9114286",  // Black Panther: Wakanda Forever
+  "tt15398776", // Oppenheimer
+  "tt0816692",  // Interstellar
+  "tt1375666",  // Inception
+  "tt0468569",  // The Dark Knight
+  "tt4154796",  // Avengers: Endgame
+  "tt6751668",  // Parasite
 ];
+
+interface OmdbResponse {
+  imdbID: string;
+  Title: string;
+  Poster: string;
+  imdbRating: string;
+  imdbVotes: string;
+  Genre: string;
+  Language: string;
+  Rated: string;
+  Response: string;
+}
+
+function formatVotes(raw: string): string {
+  const n = parseInt(raw.replace(/,/g, ""), 10);
+  if (isNaN(n)) return raw;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
+function mapOmdb(data: OmdbResponse): ApiMovie {
+  const rating = parseFloat(data.imdbRating);
+  return {
+    id:       data.imdbID,
+    title:    data.Title,
+    posterUrl: data.Poster !== "N/A" ? data.Poster : null,
+    rating:   isNaN(rating) ? null : rating,
+    votes:    data.imdbVotes !== "N/A" ? formatVotes(data.imdbVotes) : null,
+    genre:    data.Genre    !== "N/A" ? data.Genre    : null,
+    language: data.Language !== "N/A" ? data.Language : null,
+    cert:     data.Rated    !== "N/A" ? data.Rated    : null,
+  };
+}
+
+/**
+ * Fetches live movie data from the OMDb API.
+ *
+ * - All 20 IMDb IDs are fetched in parallel.
+ * - Each individual fetch is wrapped in a 5-second AbortController timeout.
+ * - If the overall fetch fails for any reason (network error, rate limit,
+ *   timeout), the catch block returns the local `moviesList` array instead,
+ *   so the page never breaks during a live demo.
+ */
+export async function fetchMoviesFromOmdb(): Promise<ApiMovie[]> {
+  const apiKey = process.env.OMDB_API_KEY;
+
+  if (!apiKey) {
+    console.warn("External API failed, falling back to local dummy data");
+    return moviesList;
+  }
+
+  try {
+    // One AbortController covers ALL parallel requests — if any stall the
+    // whole batch is cancelled after 5 seconds.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const settled = await Promise.allSettled(
+      OMDB_IMDB_IDS.map(async (id) => {
+        const res = await fetch(
+          `https://www.omdbapi.com/?i=${id}&apikey=${apiKey}`,
+          { signal: controller.signal, cache: "no-store" }
+        );
+        if (!res.ok) return null;
+        const data: OmdbResponse = await res.json();
+        if (data.Response === "False") return null;
+        return mapOmdb(data);
+      })
+    );
+
+    clearTimeout(timeoutId);
+
+    const movies = settled
+      .filter((r): r is PromiseFulfilledResult<ApiMovie> =>
+        r.status === "fulfilled" && r.value !== null
+      )
+      .map((r) => r.value);
+
+    if (movies.length === 0) throw new Error("OMDb returned 0 results");
+    return movies;
+
+  } catch (_err) {
+    console.warn("External API failed, falling back to local dummy data");
+    return moviesList;
+  }
+}
