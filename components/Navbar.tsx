@@ -3,21 +3,25 @@
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react"; 
 import UserDropdown from "@/components/UserDropdown";
 
-export default function Navbar() {
+type NavbarProps = {
+  searchQuery?: string;
+  setSearchQuery?: Dispatch<SetStateAction<string>>;
+};
+
+export default function Navbar({ searchQuery = "", setSearchQuery = () => {} }: NavbarProps) {
   const { data: session } = useSession();
   const router = useRouter();
   
-  const [searchQuery, setSearchQuery] = useState("");
+
   const [movies, setMovies] = useState<Record<string, unknown>[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Fetch all movies for client-side filtering
     fetch('/api/movies')
       .then(res => res.json())
       .then(data => {
@@ -28,7 +32,6 @@ export default function Navbar() {
       .catch(err => console.error(err));
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -40,8 +43,8 @@ export default function Navbar() {
   }, []);
 
   const filteredMovies = movies.filter(m => 
-    typeof m.title === 'string' && m.title.toLowerCase().includes(searchQuery.toLowerCase())
-  ).slice(0, 5); // show max 5 results
+    typeof m.title === 'string' && m.title.toLowerCase().includes((searchQuery ?? "").toLowerCase())
+  ).slice(0, 5); 
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -63,7 +66,6 @@ export default function Navbar() {
           </span>
         </Link>
         
-        {/* Mobile menu could go here */}
       </div>
 
       <div className="hidden md:flex flex-1 max-w-md mx-6 relative" ref={dropdownRef}>
@@ -84,7 +86,6 @@ export default function Navbar() {
           className="w-full bg-slate-950 text-slate-200 placeholder-slate-500 pl-10 pr-4 py-2 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-500 text-sm transition-colors shadow-inner"
         />
         
-        {/* Autocomplete Dropdown */}
         {isDropdownOpen && searchQuery.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50">
             {filteredMovies.length > 0 ? (

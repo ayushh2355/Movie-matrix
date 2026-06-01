@@ -46,7 +46,7 @@ export default async function MoviePage(props: Props) {
             <h1 className="text-4xl md:text-5xl font-black tracking-wide text-slate-100">
               {movie.title}
             </h1>
-            {movie.cert && (
+            {isValidCert(movie.cert) && (
               <span className="border-2 border-slate-700 px-2 py-0.5 rounded-md text-sm font-bold text-slate-400 self-start mt-2">
                 {movie.cert}
               </span>
@@ -91,4 +91,13 @@ export default async function MoviePage(props: Props) {
       </div>
     </main>
   );
+}
+
+/** Only show the cert badge for real ratings (UA, PG-13, R, U, etc.).
+ *  Hides meaningless OMDb values like "Not Rated", "Unrated", "N/A".
+ */
+function isValidCert(cert: string | null): cert is string {
+  if (!cert) return false;
+  const invalid = ["not rated", "unrated", "n/a", "none", "not applicable"];
+  return !invalid.includes(cert.toLowerCase().trim());
 }

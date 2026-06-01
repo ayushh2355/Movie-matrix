@@ -49,11 +49,34 @@ export default async function ShowtimePage(props: Props) {
         <SeatGrid 
           bookedSeatIds={bookedSeatIds} 
           movieTitle={showtime.movie.title} 
-          showTime={showtime.datetime} 
+          showTime={normalizeToFutureDate(showtime.datetime)}
           movieId={showtime.movieId}
           showtimeId={showtime.id}
         />
       </div>
     </main>
   );
+}
+
+/**
+ * Keeps the original HH:MM time from the stored showtime,
+ * but shifts the date to today or tomorrow so it is never in the past.
+ *
+ * Examples (current time = 14:00):
+ *   stored = 2024-01-01 10:00  →  tomorrow at 10:00  (10:00 already passed today)
+ *   stored = 2024-01-01 18:00  →  today    at 18:00  (18:00 hasn't passed yet)
+ */
+function normalizeToFutureDate(storedDate: Date): Date {
+  const now = new Date();
+  const normalized = new Date(now);
+
+  // Preserve the original hours and minutes from the stored showtime
+  normalized.setHours(storedDate.getHours(), storedDate.getMinutes(), 0, 0);
+
+  // If that time has already passed today, push it to tomorrow
+  if (normalized <= now) {
+    normalized.setDate(normalized.getDate() + 1);
+  }
+
+  return normalized;
 }

@@ -6,18 +6,15 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 export async function GET() {
-  // Create a fresh Prisma client to avoid stale Atlas M0 connections
   const { PrismaClient } = await import("@prisma/client");
   const db = new PrismaClient({ log: ["error"] });
 
   try {
-    // 1. Connect and warm up the Atlas connection
     console.log("[Seed] Connecting to MongoDB...");
     await db.$connect();
-    await db.movie.findFirst({ select: { id: true } }); // warm-up ping
+    await db.movie.findFirst({ select: { id: true } }); 
     console.log("[Seed] Connection warm ✅");
 
-    // 2. Fetch live data from OMDb (falls back to local moviesList if API fails)
     console.log("[Seed] Fetching movies from OMDb...");
     const movies = await fetchMoviesFromOmdb();
     console.log(`[Seed] Got ${movies.length} movies.`);
@@ -30,7 +27,6 @@ export async function GET() {
       );
     }
 
-    // 3. Clear old records one-by-one (MongoDB M0 free tier has no transactions)
     console.log("[Seed] Clearing old records...");
     const oldShowtimes = await db.showtime.findMany({ select: { id: true } });
     for (const s of oldShowtimes) {
@@ -41,7 +37,6 @@ export async function GET() {
       await db.movie.delete({ where: { id: m.id } });
     }
 
-    // 4. Insert new movies + showtimes
     const screens = ["Dolby Cinema", "IMAX"];
     const seededTitles: string[] = [];
     let showtimesCreated = 0;
@@ -49,10 +44,9 @@ export async function GET() {
     for (let idx = 0; idx < movies.length; idx++) {
       const m = movies[idx];
 
-      // Spread showtimes across the next 7 days with varied start times
       const base = new Date();
       base.setDate(base.getDate() + 1 + (idx % 7));
-      base.setHours(10 + (idx % 4) * 3, 0, 0, 0); // 10:00 / 13:00 / 16:00 / 19:00
+      base.setHours(10 + (idx % 4) * 3, 0, 0, 0); 
 
       const created = await db.movie.create({
         data: {

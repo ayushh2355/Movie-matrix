@@ -206,15 +206,6 @@ function mapOmdb(data: OmdbResponse): ApiMovie {
   };
 }
 
-/**
- * Fetches live movie data from the OMDb API.
- *
- * - All 20 IMDb IDs are fetched in parallel.
- * - Each individual fetch is wrapped in a 5-second AbortController timeout.
- * - If the overall fetch fails for any reason (network error, rate limit,
- *   timeout), the catch block returns the local `moviesList` array instead,
- *   so the page never breaks during a live demo.
- */
 export async function fetchMoviesFromOmdb(): Promise<ApiMovie[]> {
   const apiKey = process.env.OMDB_API_KEY;
 
@@ -224,8 +215,6 @@ export async function fetchMoviesFromOmdb(): Promise<ApiMovie[]> {
   }
 
   try {
-    // One AbortController covers ALL parallel requests — if any stall the
-    // whole batch is cancelled after 5 seconds.
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
