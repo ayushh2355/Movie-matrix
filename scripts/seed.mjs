@@ -65,13 +65,13 @@ async function fetchMovieFromOmdb(imdbId) {
 
   const rating = parseFloat(data.imdbRating);
 
-  return {
+return {
     title:    data.Title,
     posterUrl: data.Poster !== "N/A" ? data.Poster : null,
     rating:   isNaN(rating) ? null : rating,
     votes:    data.imdbVotes !== "N/A" ? formatVotes(data.imdbVotes) : null,
     genre:    data.Genre    !== "N/A" ? data.Genre    : null,
-    language: data.Language !== "N/A" ? data.Language : null,
+    language: data.Language !== "N/A" ? data.Language.split(",")[0].trim() : null,
     cert:     data.Rated    !== "N/A" ? data.Rated    : null,
   };
 }

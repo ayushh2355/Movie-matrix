@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Movie } from "./MovieListClient";
 
-/** Only show cert badge for real ratings. Hides "Not Rated", "Unrated", "N/A" etc. */
 function isValidCert(cert: string | null | undefined): cert is string {
   if (!cert) return false;
   const invalid = ["not rated", "unrated", "n/a", "none", "not applicable"];
@@ -11,7 +10,7 @@ function isValidCert(cert: string | null | undefined): cert is string {
 export default function MovieCard({ movie }: { movie: Movie }) {
   return (
     <div className="flex flex-col group">
-      <Link href={`/movie/${movie.id}`} className="relative aspect-2/3 w-full rounded-2xl overflow-hidden shadow-lg border border-slate-900 hover:border-slate-800/80 transition-all select-none">
+      <Link href={`/movie/${movie.id}`} className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-lg border border-slate-900 hover:border-slate-800/80 transition-all select-none">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
           style={{ backgroundImage: `url(${movie.posterUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=500"})` }}
