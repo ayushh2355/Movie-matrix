@@ -2,24 +2,38 @@ import MovieCard from "@/components/MovieCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import { prisma } from "@/lib/prisma";
 import { fetchMoviesFromOmdb } from "@/lib/data";
+
 export const dynamic = "force-dynamic";
 
+const BANNER_MAP: Record<string, string> = {
+  "kalki":  "/banners/kalki-poster.jpg",
+  "pushpa": "/banners/pushpa-poster.jpg",
+  "salaar": "/banners/salaar-poster.jpg",
+};
+
+function getBannerForMovie(title: string): string | null {
+  const lower = title.toLowerCase();
+  for (const [keyword, path] of Object.entries(BANNER_MAP)) {
+    if (lower.includes(keyword)) return path;
+  }
+  return null; 
+}
+
 export default async function Home() {
-  
   const dbMovies = await prisma.movie.findMany();
-const allMovies = dbMovies.length > 0 ? dbMovies : await fetchMoviesFromOmdb();
+  const allMovies = dbMovies.length > 0 ? dbMovies : await fetchMoviesFromOmdb();
 
-  const MAX_RECOMMENDED_MOVIES = 18;
-
+  const MAX_RECOMMENDED_MOVIES = 40;
   const recommendedMovies = allMovies.slice(0, MAX_RECOMMENDED_MOVIES);
 
-  const featuredMovies = allMovies.slice(1, 4).map((m) => ({
-    id: m.id,
-    title: m.title,
-    genre: [m.genre, m.language, m.cert].filter(Boolean).join(" • "),
-    bgImage: m.posterUrl || "",
-    rating: m.rating || "N/A",
-    votes: m.votes || "0",
+  const featuredMovies = allMovies.slice(0, 3).map((m) => ({
+    id:          m.id,
+    title:       m.title,
+    genre:       [m.genre, m.language, m.cert].filter(Boolean).join(" • "),
+    bgImage:     m.posterUrl || "",           
+    bannerImage: getBannerForMovie(m.title),  
+    rating:      m.rating || "N/A",
+    votes:       m.votes || "0",
   }));
 
   return (
