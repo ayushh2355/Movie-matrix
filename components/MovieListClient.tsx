@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useState, useMemo } from "react";
 import MovieCard from "@/components/MovieCard";
-import Footer from "@/components/Footer";
 
 export type Movie = {
   id: string;
@@ -21,80 +20,99 @@ type Props = {
 };
 
 export default function MovieListClient({ initialMovies }: Props) {
-  const featuredMovie = initialMovies.length > 0 ? initialMovies[0] : null;
+  const [language, setLanguage] = useState("All");
+  const [genre, setGenre] = useState("All");
+
+  const { uniqueGenres, uniqueLanguages } = useMemo(() => {
+    const genreSet = new Set<string>();
+    const langSet = new Set<string>();
+    
+    const ALLOWED_LANGUAGES = ["English", "Hindi", "Telugu", "Tamil", "Malayalam", "Kannada"];
+    const ALLOWED_GENRES = ["Action", "Comedy", "Drama", "Sci-Fi", "Romance", "Thriller", "Horror", "Adventure"];
+    
+    initialMovies.forEach(m => {
+      if (m.genre) {
+        ALLOWED_GENRES.forEach(allowedGenre => {
+          if (m.genre?.toLowerCase().includes(allowedGenre.toLowerCase())) {
+            genreSet.add(allowedGenre);
+          }
+        });
+      }
+      if (m.language) {
+        ALLOWED_LANGUAGES.forEach(allowedLang => {
+          if (m.language?.toLowerCase().includes(allowedLang.toLowerCase())) {
+            langSet.add(allowedLang);
+          }
+        });
+      }
+    });
+    
+    return {
+      uniqueGenres: ["All", ...Array.from(genreSet)],
+      uniqueLanguages: ["All", ...Array.from(langSet)]
+    };
+  }, [initialMovies]);
+
+  const filteredMovies = useMemo(() => {
+    let result = initialMovies;
+    if (genre !== "All") {
+      result = result.filter(m => m.genre?.toLowerCase().includes(genre.toLowerCase()));
+    }
+    if (language !== "All") {
+      result = result.filter(m => m.language?.toLowerCase().includes(language.toLowerCase()));
+    }
+    return result;
+  }, [initialMovies, genre, language]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-
-      {featuredMovie && (
-        <section className="relative w-full aspect-[2.8/1] md:aspect-[3.5/1] overflow-hidden bg-slate-900 select-none">
-          <div
-            className="absolute inset-0 bg-cover filter brightness-[0.35] scale-105"
-            style={{
-              backgroundImage: `url(${featuredMovie.posterUrl})`,
-              backgroundPosition: "center 20%"
-            }}
-          />
-          <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-950/70 to-transparent" />
-          <div className="absolute inset-0 bg-linear-to-t from-slate-950 to-transparent" />
-
-          <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-16 space-y-2 md:space-y-4 max-w-xl md:max-w-2xl z-10">
-            <div className="inline-flex items-center gap-2">
-              <span className="bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded">
-                Trending #1
-              </span>
-              <span className="text-[11px] font-bold text-slate-400">
-                ★ {featuredMovie.rating || "N/A"}/10 ({featuredMovie.votes || "0"} Votes)
-              </span>
-            </div>
-
-            <h1 className="text-2xl md:text-4xl font-extrabold text-slate-100 tracking-wide leading-tight">
-              {featuredMovie.title}
-            </h1>
-
-            <p className="text-xs text-slate-300 font-semibold hidden md:block">
-              {[featuredMovie.genre, featuredMovie.language, featuredMovie.cert].filter(Boolean).join(" • ")}
-            </p>
-
-            <div className="pt-2">
-              <Link
-                href={`/movie/${featuredMovie.id}`}
-                className="inline-block bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 text-xs font-black tracking-wider uppercase px-6 py-2.5 rounded-xl shadow-lg hover:shadow-amber-500/20 active:scale-95 transition-all"
-              >
-                Book Tickets Now
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-10 flex-1">
-        <section className="w-full space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3 select-none">
+    <div className="w-full">
+      <section className="w-full space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3 select-none">
+          <div className="flex items-center gap-4">
             <h2 className="text-sm font-black tracking-wider uppercase text-slate-200">
-              Now Showing
+              Recommended Movies
             </h2>
-            <span className="text-xs text-slate-500 font-medium">
-              {initialMovies.length} movies
+            <span className="text-xs text-slate-500 font-medium hidden sm:block">
+              {filteredMovies.length} movies available
             </span>
           </div>
 
-          {initialMovies.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {initialMovies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+          <div className="flex items-center gap-3">
+            <select
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded px-2 py-1 outline-none focus:border-amber-500 transition-colors cursor-pointer"
+            >
+              {uniqueGenres.map(g => (
+                <option key={g} value={g}>{g === "All" ? "All Genres" : g}</option>
               ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-900/20 border border-dashed border-slate-800/80 rounded-2xl select-none">
-              <h3 className="text-sm font-bold text-slate-300">No movies available</h3>
-              <p className="text-xs text-slate-500 mt-1">Check back soon for upcoming shows.</p>
-            </div>
-          )}
-        </section>
-      </div>
+            </select>
+            
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded px-2 py-1 outline-none focus:border-amber-500 transition-colors cursor-pointer"
+            >
+              {uniqueLanguages.map(l => (
+                <option key={l} value={l}>{l === "All" ? "All Languages" : l}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-      <Footer />
+        {filteredMovies.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+            {filteredMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie as any} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 bg-slate-900/20 border border-dashed border-slate-800/80 rounded-2xl select-none">
+            <h3 className="text-sm font-bold text-slate-300">No movies found</h3>
+            <p className="text-xs text-slate-500 mt-1">Try adjusting your filters.</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
