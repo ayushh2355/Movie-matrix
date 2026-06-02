@@ -21,16 +21,14 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       toast.error("Name cannot be empty");
       return;
     }
-
     setIsSaving(true);
-
     try {
       const res = await fetch("/api/user/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name: name.trim() }),
       });
 
       if (res.ok) {
@@ -41,7 +39,8 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         toast.error(data.error || "Failed to update profile");
       }
     } catch (error) {
-      toast.error("An error occurred while saving");
+        console.error("Profile update failed:", error);
+        toast.error("An error occurred while saving");
     } finally {
       setIsSaving(false);
     }
@@ -59,6 +58,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={50}     
               className="w-full bg-slate-900 border border-slate-700 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-200 font-medium outline-none transition-colors"
               placeholder="Enter your full name"
             />

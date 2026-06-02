@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-
+import Image from "next/image";
 type Props = {
   params: Promise<{ id: string }>;
 };
@@ -21,7 +21,6 @@ export default async function MoviePage(props: Props) {
   if (!movie) {
     notFound();
   }
-
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 md:px-8">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-8 md:gap-12">
@@ -30,10 +29,11 @@ export default async function MoviePage(props: Props) {
         <div className="w-full md:w-5/12 lg:w-2/5 shrink-0">
           <div className="aspect-2/3 md:aspect-auto md:h-full w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-800 relative bg-slate-900 min-h-[450px]">
             {movie.posterUrl ? (
-              <img 
-                src={movie.posterUrl} 
-                alt={movie.title} 
-                className="w-full h-full object-cover"
+              <Image
+              src={movie.posterUrl}
+              alt={movie.title}
+              fill
+              className="object-cover"
               />
             ) : (
               <div className="flex items-center justify-center w-full h-full text-slate-600">No Poster</div>
@@ -92,10 +92,6 @@ export default async function MoviePage(props: Props) {
     </main>
   );
 }
-
-/** Only show the cert badge for real ratings (UA, PG-13, R, U, etc.).
- *  Hides meaningless OMDb values like "Not Rated", "Unrated", "N/A".
- */
 function isValidCert(cert: string | null): cert is string {
   if (!cert) return false;
   const invalid = ["not rated", "unrated", "n/a", "none", "not applicable"];

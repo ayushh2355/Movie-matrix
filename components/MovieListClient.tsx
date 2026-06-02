@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import MovieCard from "@/components/MovieCard";
 import Footer from "@/components/Footer";
 
@@ -23,35 +21,18 @@ type Props = {
 };
 
 export default function MovieListClient({ initialMovies }: Props) {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredMovies = useMemo(() => {
-    return initialMovies.filter((movie) =>
-      movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [initialMovies, searchQuery]);
-
-  const featuredMovie = useMemo(() => {
-    return initialMovies.length > 0 ? initialMovies[0] : null;
-  }, [initialMovies]);
+  const featuredMovie = initialMovies.length > 0 ? initialMovies[0] : null;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      
-      <Navbar 
-        searchQuery={searchQuery} 
-        setSearchQuery={setSearchQuery} 
-      />
 
       {featuredMovie && (
         <section className="relative w-full aspect-[2.8/1] md:aspect-[3.5/1] overflow-hidden bg-slate-900 select-none">
-        
-         
-          <div 
+          <div
             className="absolute inset-0 bg-cover filter brightness-[0.35] scale-105"
-            style={{ 
+            style={{
               backgroundImage: `url(${featuredMovie.posterUrl})`,
-              backgroundPosition: "center 20%" 
+              backgroundPosition: "center 20%"
             }}
           />
           <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-950/70 to-transparent" />
@@ -66,7 +47,7 @@ export default function MovieListClient({ initialMovies }: Props) {
                 ★ {featuredMovie.rating || "N/A"}/10 ({featuredMovie.votes || "0"} Votes)
               </span>
             </div>
-            
+
             <h1 className="text-2xl md:text-4xl font-extrabold text-slate-100 tracking-wide leading-tight">
               {featuredMovie.title}
             </h1>
@@ -76,7 +57,7 @@ export default function MovieListClient({ initialMovies }: Props) {
             </p>
 
             <div className="pt-2">
-              <Link 
+              <Link
                 href={`/movie/${featuredMovie.id}`}
                 className="inline-block bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 text-xs font-black tracking-wider uppercase px-6 py-2.5 rounded-xl shadow-lg hover:shadow-amber-500/20 active:scale-95 transition-all"
               >
@@ -94,25 +75,25 @@ export default function MovieListClient({ initialMovies }: Props) {
               Now Showing
             </h2>
             <span className="text-xs text-slate-500 font-medium">
-              Showing {filteredMovies.length} movies
+              {initialMovies.length} movies
             </span>
           </div>
 
-          {filteredMovies.length > 0 ? (
+          {initialMovies.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {filteredMovies.map((movie) => (
+              {initialMovies.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 bg-slate-900/20 border border-dashed border-slate-800/80 rounded-2xl select-none">
-              <h3 className="text-sm font-bold text-slate-300">No movies found</h3>
-              <p className="text-xs text-slate-500 mt-1">Try modifying your search query.</p>
+              <h3 className="text-sm font-bold text-slate-300">No movies available</h3>
+              <p className="text-xs text-slate-500 mt-1">Check back soon for upcoming shows.</p>
             </div>
           )}
         </section>
       </div>
-      
+
       <Footer />
     </div>
   );

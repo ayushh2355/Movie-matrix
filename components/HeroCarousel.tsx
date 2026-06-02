@@ -43,7 +43,8 @@ export default function HeroCarousel({ movies }: HeroCarouselProps) {
           className={`absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out ${
             index === currentSlide ? "opacity-100 scale-100 z-0" : "opacity-0 scale-105 -z-10"
           }`}
-          style={{ backgroundImage: `url(${movie.bgImage})` }}
+          style={{ backgroundImage: `url(${movie.bgImage})`,
+                   backgroundPosition: "10% top",}}
         />
       ))}
 

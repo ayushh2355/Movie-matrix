@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Screen from "@/components/Screen";
+import SeatButton from "@/components/SeatButton";
+import BookingSidebar from "@/components/BookingSidebar";
 
 export type Seat = {
   id: string;
@@ -24,7 +27,6 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [booking, setBooking] = useState(false);
 
- 
   const seats: Seat[] = [];
   const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   for (const row of rows) {
@@ -46,7 +48,6 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
     );
   };
 
-
   const groupedSeats: { [key: string]: Seat[] } = {};
   seats.forEach((seat) => {
     if (!groupedSeats[seat.row]) groupedSeats[seat.row] = [];
@@ -54,7 +55,7 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
   });
 
   const selectedSeatDetails = seats.filter((s) => selectedSeats.includes(s.id));
-  
+
   const getSeatPrice = (row: string) => {
     const r = row.toUpperCase();
     if (r === "A" || r === "B") return 200;
@@ -89,7 +90,7 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
       } else {
         toast.error("Booking failed. Please try again.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Booking failed. Please try again.");
     } finally {
       setBooking(false);
@@ -105,8 +106,8 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
   return (
     <div className="w-full bg-slate-900/80 backdrop-blur-md rounded-3xl shadow-2xl border border-slate-800/80 overflow-hidden">
       <div className="flex flex-col md:flex-row min-h-[580px]">
-        
-       
+
+        {/* Seat Map */}
         <div className="flex-1 p-6 md:p-8 flex flex-col items-center justify-between">
           <Screen />
 
@@ -136,19 +137,19 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
                           <div className="flex-1 grid grid-cols-11 gap-1.5">
                             {Array.from({ length: 11 }, (_, i) => i + 1).map((colIndex) => {
                               if (colIndex === 6) return <div key={`aisle-${rowKey}`} className="w-full aspect-square pointer-events-none" />;
-                              
+
                               const seatCol = colIndex < 6 ? colIndex : colIndex - 1;
                               const seat = sortedSeats.find((s) => s.col === seatCol);
-                              
+
                               if (!seat) return <div key={colIndex} className="w-full aspect-square opacity-0 pointer-events-none" />;
-                              
+
                               return (
-                                <SeatButton 
-                                  key={seat.id} 
-                                  seat={seat} 
-                                  tier={tier} 
-                                  isSelected={selectedSeats.includes(seat.id)} 
-                                  onClick={() => toggleSeat(seat.id)} 
+                                <SeatButton
+                                  key={seat.id}
+                                  seat={seat}
+                                  tier={tier}
+                                  isSelected={selectedSeats.includes(seat.id)}
+                                  onClick={() => toggleSeat(seat.id)}
                                 />
                               );
                             })}
@@ -165,8 +166,8 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
 
         <div className="hidden md:block w-px bg-slate-800/80 self-stretch" />
 
-     
-        <BookingSidebar 
+        {/* Booking Sidebar */}
+        <BookingSidebar
           movieTitle={movieTitle}
           showTime={showTime}
           selectedSeats={selectedSeats}
@@ -176,120 +177,6 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
           booking={booking}
           handleBooking={handleBooking}
         />
-      </div>
-    </div>
-  );
-}
-
-
-
-function Screen() {
-  return (
-    <div className="w-full max-w-md flex flex-col items-center mb-10 relative">
-      <div className="w-[85%] h-5 border-t-[3px] border-cyan-400/80 rounded-[100%] shadow-[0_-8px_16px_-4px_rgba(34,211,238,0.3)] relative flex items-center justify-center">
-        <div className="absolute top-[3px] left-0 right-0 h-8 bg-linear-to-b from-cyan-500/10 to-transparent blur-md pointer-events-none" />
-      </div>
-      <span className="text-cyan-400 font-extrabold tracking-[0.25em] uppercase text-[10px] mt-2.5 select-none drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">
-        SCREEN
-      </span>
-    </div>
-  );
-}
-
-function SeatButton({ seat, tier, isSelected, onClick }: { seat: Seat; tier: any; isSelected: boolean; onClick: () => void }) {
-  const isBooked = seat.status !== "AVAILABLE";
-  return (
-    <button
-      disabled={isBooked}
-      onClick={onClick}
-      title={`${seat.row}${seat.col} - ${tier.name} (₹${tier.price})`}
-      className={`
-        w-full aspect-square flex items-center justify-center rounded text-[10px] font-black transition-all duration-150 select-none border
-        ${isBooked ? "bg-rose-950/40 text-rose-500/50 border-rose-950 cursor-not-allowed opacity-40 shadow-sm relative overflow-hidden"
-          : isSelected ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.4)] scale-105"
-          : tier.seatBg
-        }
-      `}
-    >
-      {seat.col}
-    </button>
-  );
-}
-
-function BookingSidebar({ movieTitle, showTime, selectedSeats, selectedSeatDetails, totalPrice, selectedTiersBreakdown, booking, handleBooking }: any) {
-  const formatShowTime = (time: string | Date) => {
-    try {
-      return new Date(time).toLocaleString("en-US", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
-    } catch { return String(time); }
-  };
-
-  return (
-    <div className="w-full md:w-[350px] p-6 md:p-8 bg-slate-950/50 backdrop-blur-sm flex flex-col justify-between border-t md:border-t-0 border-slate-800/80">
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-slate-100 tracking-wide mb-1.5 select-none">{movieTitle}</h2>
-          <p className="text-xs text-slate-400 font-semibold mb-6 select-none">{formatShowTime(showTime)}</p>
-        </div>
-
-        <div className="space-y-5 border-t border-slate-800/60 pt-5">
-          {selectedSeats.length > 0 ? (
-            <div className="space-y-4">
-              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest select-none">Ticket Details</h3>
-              {Object.entries(selectedTiersBreakdown).map(([tierName, count]: any) => {
-                if (count === 0) return null;
-                const tierPrice = tierName === "Bronze" ? 200 : tierName === "Silver" ? 300 : 500;
-                return (
-                  <div key={tierName} className="flex justify-between items-center text-sm">
-                    <span className="text-slate-300 font-medium select-none">{count} x {tierName}</span>
-                    <span className="text-slate-200 font-bold">₹{count * tierPrice}</span>
-                  </div>
-                );
-              })}
-              
-              <div className="pt-2">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 select-none">Selected Seats</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedSeatDetails.map((seat: Seat) => {
-                    const t = seat.row <= "B" ? "Bronze" : seat.row <= "F" ? "Silver" : "Gold";
-                    const badge = t === "Bronze" ? "bg-zinc-900/60 text-zinc-300 border-zinc-800" : t === "Silver" ? "bg-slate-900/60 text-slate-300 border-slate-800" : "bg-yellow-950/40 text-yellow-300 border-yellow-900/40";
-                    return <span key={seat.id} className={`text-[9px] font-black px-2 py-0.5 rounded border select-none ${badge}`}>{seat.row}{seat.col}</span>;
-                  })}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8 select-none">
-              <p className="text-sm text-slate-500">No seats selected yet</p>
-              <p className="text-[11px] text-slate-600 mt-1">Select seats on the left to start booking</p>
-            </div>
-          )}
-          
-          <div className="border-t border-slate-800/80 pt-4 mt-6 flex justify-between items-center">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest select-none">Total Amount</span>
-            <span className="text-2xl font-black text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.25)]">₹{totalPrice}</span>
-          </div>
-        </div>
-
-        <button disabled={selectedSeats.length === 0 || booking} onClick={handleBooking} className={`w-full py-3 rounded-xl font-black text-xs shadow-md transition-all duration-150 select-none uppercase tracking-wider border ${selectedSeats.length > 0 && !booking ? "bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 border-amber-400/30 hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] active:scale-[0.98] cursor-pointer" : "bg-slate-900/50 text-slate-600 border-slate-800/80 cursor-not-allowed shadow-none"}`}>
-          {booking ? "Booking..." : "Book Now"}
-        </button>
-      </div>
-
-      <Legend />
-    </div>
-  );
-}
-
-function Legend() {
-  return (
-    <div className="mt-8 pt-6 border-t border-slate-800/60 space-y-3">
-      <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest select-none mb-1.5">Seat Categories</h4>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-        <div className="flex items-center gap-2"><div className="w-3.5 h-3.5 bg-zinc-800/40 border border-zinc-700/60 rounded" /><span className="text-[10px] font-semibold text-slate-400 select-none">Bronze (₹200)</span></div>
-        <div className="flex items-center gap-2"><div className="w-3.5 h-3.5 bg-slate-800/40 border border-slate-700/60 rounded" /><span className="text-[10px] font-semibold text-slate-400 select-none">Silver (₹300)</span></div>
-        <div className="flex items-center gap-2"><div className="w-3.5 h-3.5 bg-yellow-950/40 border border-yellow-900/60 rounded" /><span className="text-[10px] font-semibold text-slate-400 select-none">Gold (₹500)</span></div>
-        <div className="flex items-center gap-2"><div className="w-3.5 h-3.5 bg-rose-950/40 border border-rose-950/60 rounded opacity-60" /><span className="text-[10px] font-semibold text-slate-400 select-none">Sold Out</span></div>
-        <div className="flex items-center gap-2 col-span-2"><div className="w-3.5 h-3.5 bg-emerald-500 border border-emerald-400 rounded shadow-[0_0_8px_rgba(16,185,129,0.35)]" /><span className="text-[10px] font-semibold text-slate-400 select-none">Selected Seat</span></div>
       </div>
     </div>
   );
