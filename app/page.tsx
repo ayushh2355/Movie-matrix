@@ -19,7 +19,15 @@ function getBannerForMovie(title: string): string | null {
 }
 
 export default async function Home() {
-  const allMovies = await prisma.movie.findMany();
+  const allMovies = await prisma.movie.findMany({
+  where: {
+    posterUrl: { not: null },
+    OR: [
+      { rating: { gt: 0 } },  
+      { votes: { not: "0" } }, 
+    ],  
+  }
+});
 
   const recommended = allMovies.slice(0, 16);
 
