@@ -26,7 +26,7 @@ export default function Error({
           We couldn't connect to the database. Please check your internet connection and try again.
         </p>
         <button
-          onClick={() => reset()}
+          onClick={() => window.location.reload()}
           className="w-full py-3.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-900 text-sm font-black tracking-wider uppercase rounded-xl transition-all shadow-[0_0_15px_rgba(245,197,24,0.3)] hover:shadow-[0_0_25px_rgba(245,197,24,0.5)]"
         >
           Try Again
