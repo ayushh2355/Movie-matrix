@@ -110,7 +110,7 @@ export default function MovieListClient({
   const recHasMore = filteredRecommended.length > INITIAL_SHOW;
 
   const FilterBar = (
-    <div className="flex items-center justify-between select-none">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 select-none">
       <button
         onClick={() => { setShowAllMovies(prev => !prev); setSelectedGenre("All"); setSelectedLanguage("All"); setShowAllRecommended(false); }}
         className={`text-xs font-semibold tracking-wider uppercase cursor-pointer transition-all border rounded px-2.5 py-1 ${
@@ -122,7 +122,7 @@ export default function MovieListClient({
         {showAllMovies ? "← Back to Sections" : "Show All Movies"}
       </button>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <select
           value={selectedGenre}
           onChange={(e) => { setSelectedGenre(e.target.value); setShowAllMovies(false); setShowAllRecommended(false); }}

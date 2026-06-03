@@ -95,11 +95,12 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
       <div className="flex flex-col md:flex-row min-h-[580px]">
 
         {/* Seat Map */}
-        <div className="flex-1 p-6 md:p-8 flex flex-col items-center justify-between">
+        <div className="flex-1 p-3 sm:p-6 md:p-8 flex flex-col items-center justify-between overflow-x-hidden">
           <Screen />
 
-          <div className="w-full max-w-md space-y-8 mb-6">
-            {tiers.map((tier) => {
+          <div className="w-full max-w-md overflow-x-auto pb-6 scrollbar-hide">
+            <div className="min-w-[380px] sm:min-w-0 space-y-8 mb-6 px-1">
+              {tiers.map((tier) => {
               const hasSeatsInTier = tier.rows.some((rowKey) => groupedSeats[rowKey]?.length > 0);
               if (!hasSeatsInTier) return null;
 
@@ -148,6 +149,7 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
 
