@@ -20,6 +20,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -42,7 +43,9 @@ export default function Navbar() {
   }, []);
 
   const filteredMovies = searchQuery.trim()
-    ? movies.filter((m) => m.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6)
+    ? movies
+        .filter((m) => m.title.toLowerCase().includes(searchQuery.toLowerCase()) && m.posterUrl && m.posterUrl !== "N/A" && !failedImages.has(m.id))
+        .slice(0, 6)
     : [];
 
   const handleSelect = (movieId: string) => {
@@ -105,7 +108,12 @@ export default function Navbar() {
                       className="w-full text-left px-4 py-3 flex items-center gap-3 border-b border-slate-800/50 last:border-0 hover:bg-slate-800/60 transition-colors"
                     >
                       {movie.posterUrl ? (
-                        <img src={movie.posterUrl} alt={movie.title} className="w-8 h-10 object-cover rounded shrink-0" />
+                        <img 
+                          src={movie.posterUrl} 
+                          alt={movie.title} 
+                          onError={() => setFailedImages(prev => new Set(prev).add(movie.id))}
+                          className="w-8 h-10 object-cover rounded shrink-0" 
+                        />
                       ) : (
                         <div className="w-8 h-10 bg-slate-800 rounded shrink-0 flex items-center justify-center">
                           <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
