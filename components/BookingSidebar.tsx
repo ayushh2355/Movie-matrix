@@ -1,4 +1,4 @@
-import { Seat } from "./SeatGrid";
+import { Seat, TIER_PRICES } from "./SeatGrid";
 import Legend from "./Legend";
 
 interface BookingSidebarProps {
@@ -78,7 +78,7 @@ export default function BookingSidebar({
 
               {Object.entries(selectedTiersBreakdown).map(([tierName, count]: any) => {
                 if (count === 0) return null;
-                const tierPrice = tierName === "Bronze" ? 200 : tierName === "Silver" ? 300 : 500;
+                const tierPrice = TIER_PRICES[tierName];
                 return (
                   <div key={tierName} className="flex justify-between items-center text-sm">
                     <span className="text-slate-300 font-medium select-none">{count} x {tierName}</span>

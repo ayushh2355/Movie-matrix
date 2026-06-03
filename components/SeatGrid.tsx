@@ -7,6 +7,12 @@ import Screen from "@/components/Screen";
 import SeatButton from "@/components/SeatButton";
 import BookingSidebar from "@/components/BookingSidebar";
 
+export const TIER_PRICES: Record<string, number> = {
+  Bronze: 200,
+  Silver: 300,
+  Gold: 500,
+};
+
 export type Seat = {
   id: string;
   row: string;
@@ -58,9 +64,9 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
 
   const getSeatPrice = (row: string) => {
     const r = row.toUpperCase();
-    if (r === "A" || r === "B") return 200;
-    if (r === "C" || r === "D" || r === "E" || r === "F") return 300;
-    return 500;
+    if (r === "A" || r === "B") return TIER_PRICES.Bronze;
+    if (r === "C" || r === "D" || r === "E" || r === "F") return TIER_PRICES.Silver;
+    return TIER_PRICES.Gold;
   };
 
   const totalPrice = selectedSeatDetails.reduce((sum, seat) => sum + getSeatPrice(seat.row), 0);
@@ -79,9 +85,9 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
   };
 
   const tiers = [
-    { name: "Bronze", price: 200, rows: ["A", "B"], badgeColor: "bg-zinc-900/90 text-zinc-300 border-zinc-700/60", seatBg: "bg-zinc-800/40 border-zinc-700/40 text-zinc-300 hover:bg-zinc-500 hover:text-white" },
-    { name: "Silver", price: 300, rows: ["C", "D", "E", "F"], badgeColor: "bg-slate-900/90 text-slate-300 border-slate-700/60", seatBg: "bg-slate-800/40 border-slate-700/40 text-slate-300 hover:bg-slate-500 hover:text-white" },
-    { name: "Gold", price: 500, rows: ["G", "H"], badgeColor: "bg-yellow-950/80 text-yellow-400 border-yellow-800/60", seatBg: "bg-yellow-950/30 border-yellow-900/40 text-yellow-300/80 hover:bg-yellow-600 hover:text-white" },
+    { name: "Bronze", price: TIER_PRICES.Bronze, rows: ["A", "B"], badgeColor: "bg-zinc-900/90 text-zinc-300 border-zinc-700/60", seatBg: "bg-zinc-800/40 border-zinc-700/40 text-zinc-300 hover:bg-zinc-500 hover:text-white" },
+    { name: "Silver", price: TIER_PRICES.Silver, rows: ["C", "D", "E", "F"], badgeColor: "bg-slate-900/90 text-slate-300 border-slate-700/60", seatBg: "bg-slate-800/40 border-slate-700/40 text-slate-300 hover:bg-slate-500 hover:text-white" },
+    { name: "Gold", price: TIER_PRICES.Gold, rows: ["G", "H"], badgeColor: "bg-yellow-950/80 text-yellow-400 border-yellow-800/60", seatBg: "bg-yellow-950/30 border-yellow-900/40 text-yellow-300/80 hover:bg-yellow-600 hover:text-white" },
   ];
 
   return (
@@ -188,7 +194,7 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Category</p>
                 {Object.entries(selectedTiersBreakdown).map(([tierName, count]: any) => {
                   if (count === 0) return null;
-                  const tierPrice = tierName === "Bronze" ? 200 : tierName === "Silver" ? 300 : 500;
+                  const tierPrice = TIER_PRICES[tierName];
                   return (
                     <div key={tierName} className="flex justify-between items-center text-sm">
                       <span className="text-slate-300">{count} x {tierName} (₹{tierPrice}/seat)</span>

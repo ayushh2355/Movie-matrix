@@ -7,6 +7,12 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
+function isValidCert(cert: string | null): cert is string {
+  if (!cert) return false;
+  const invalid = ["not rated", "unrated", "n/a", "none", "not applicable"];
+  return !invalid.includes(cert.toLowerCase().trim());
+}
+
 export default async function MoviePage(props: Props) {
   const { id } = await props.params;
 
@@ -87,9 +93,4 @@ export default async function MoviePage(props: Props) {
       </div>
     </main>
   );
-}
-function isValidCert(cert: string | null): cert is string {
-  if (!cert) return false;
-  const invalid = ["not rated", "unrated", "n/a", "none", "not applicable"];
-  return !invalid.includes(cert.toLowerCase().trim());
 }
