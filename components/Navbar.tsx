@@ -11,6 +11,8 @@ type Movie = {
   title: string;
   posterUrl: string | null;
   genre: string | null;
+  rating?: number | null;
+  votes?: string | null;
 };
 
 export default function Navbar() {
@@ -44,7 +46,12 @@ export default function Navbar() {
 
   const filteredMovies = searchQuery.trim()
     ? movies
-        .filter((m) => m.title.toLowerCase().includes(searchQuery.toLowerCase()) && m.posterUrl && m.posterUrl !== "N/A" && !failedImages.has(m.id))
+        .filter((m) => {
+          const hasNoVotes = !m.votes || m.votes === "0" || m.votes.toLowerCase() === "n/a";
+          const hasNoRating = !m.rating || m.rating === 0;
+          const isInvalid = !m.posterUrl || m.posterUrl === "N/A" || failedImages.has(m.id) || hasNoVotes || hasNoRating;
+          return m.title.toLowerCase().includes(searchQuery.toLowerCase()) && !isInvalid;
+        })
         .slice(0, 6)
     : [];
 

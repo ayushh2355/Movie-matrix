@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name } = body;
 
-    if (!name || typeof name !== "string" || name.trim().length > 50) {
+    if (!name || typeof name !== "string" || name.trim().length === 0 || name.trim().length > 50) {
       return NextResponse.json({ error: "Invalid name." }, { status: 400 });
     }
 

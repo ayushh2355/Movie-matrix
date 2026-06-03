@@ -59,7 +59,15 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!seatIds.every((id: unknown) => typeof id === "string" && id.trim().length > 0)) {
+    if (new Set(seatIds).size !== seatIds.length) {
+      return NextResponse.json(
+        { error: "Invalid request: duplicate seat IDs found." },
+        { status: 400 }
+      );
+    }
+
+    const seatRegex = /^[A-H]([1-9]|10|11)$/;
+    if (!seatIds.every((id: unknown) => typeof id === "string" && seatRegex.test(id.trim()))) {
       return NextResponse.json(
         { error: "Invalid request: one or more seat IDs are invalid." },
         { status: 400 }
@@ -86,36 +94,36 @@ export async function POST(req: Request) {
     }
 
     const booking = await prisma.$transaction(async (tx) => {
-      const conflictingBooking = await tx.booking.findFirst({
-        where: {
-          showtimeId,
-          seats: { hasSome: seatIds },
-          status: "CONFIRMED",
-        },
-        select: { seats: true },
+        const conflictingBooking = await tx.booking.findFirst({
+          where: {
+            showtimeId,
+            seats: { hasSome: seatIds },
+            status: "CONFIRMED",
+          },
+          select: { seats: true },
+        });
+
+        if (conflictingBooking) {
+          const takenSeats = conflictingBooking.seats
+            .filter((s: string) => seatIds.includes(s))
+            .join(", ");
+          throw new Error(`SEATS_TAKEN:${takenSeats}`);
+        }
+
+        return tx.booking.create({
+          data: {
+            userId:     session.user.id,
+            showtimeId,
+            seats:      seatIds,
+            totalPrice, 
+          },
+        });
       });
 
-      if (conflictingBooking) {
-        const takenSeats = conflictingBooking.seats
-          .filter((s: string) => seatIds.includes(s))
-          .join(", ");
-        throw new Error(`SEATS_TAKEN:${takenSeats}`);
-      }
-
-      return tx.booking.create({
-        data: {
-          userId:     session.user.id,
-          showtimeId,
-          seats:      seatIds,
-          totalPrice, 
-        },
-      });
-    });
-
-    return NextResponse.json(
-      { message: "Booking confirmed!", booking },
-      { status: 201 }
-    );
+      return NextResponse.json(
+        { message: "Booking confirmed!", booking },
+        { status: 201 }
+      );
 
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("SEATS_TAKEN:")) {

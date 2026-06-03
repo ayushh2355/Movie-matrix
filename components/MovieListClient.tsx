@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import MovieCard from "@/components/MovieCard";
 
@@ -26,7 +26,7 @@ type Props = {
 
 const INITIAL_SHOW = 4;
 
-function Section({ title, movies }: { title: string; movies: Movie[] }) {
+function Section({ title, movies, onImageError }: { title: string; movies: Movie[]; onImageError: (id: string) => void }) {
   const [showAll, setShowAll] = useState(false);
   const visible = showAll ? movies : movies.slice(0, INITIAL_SHOW);
   const hasMore = movies.length > INITIAL_SHOW;
@@ -49,7 +49,7 @@ function Section({ title, movies }: { title: string; movies: Movie[] }) {
       <div className="h-px bg-gradient-to-r from-amber-500/40 via-slate-700 to-transparent mb-2" />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
         {visible.map((movie) => (
-          <MovieCard key={movie.id} movie={movie as any} />
+          <MovieCard key={movie.id} movie={movie as any} onImageError={onImageError} />
         ))}
       </div>
     </section>
@@ -72,11 +72,28 @@ export default function MovieListClient({
   const [selectedLanguage, setSelectedLanguage] = useState("All");
   const [showAllRecommended, setShowAllRecommended] = useState(false);
   const [showAllMovies, setShowAllMovies] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+
+  const isValidMovie = useCallback((m: Movie) => {
+    const hasNoVotes = !m.votes || m.votes === "0" || m.votes.toLowerCase() === "n/a";
+    const hasNoRating = !m.rating || m.rating === 0;
+    const hasNoPoster = !m.posterUrl || m.posterUrl === "N/A";
+    return !hasNoVotes && !hasNoRating && !hasNoPoster && !failedImages.has(m.id);
+  }, [failedImages]);
+
+  const handleImageError = useCallback((id: string) => {
+    setFailedImages(prev => new Set(prev).add(id));
+  }, []);
+
+  const validAllMovies = useMemo(() => allMovies.filter(isValidMovie), [allMovies, isValidMovie]);
+  const validRecommended = useMemo(() => recommended.filter(isValidMovie), [recommended, isValidMovie]);
+  const validTrending = useMemo(() => trending.filter(isValidMovie), [trending, isValidMovie]);
+  const validTopRated = useMemo(() => topRated.filter(isValidMovie), [topRated, isValidMovie]);
 
   const isFiltering = selectedGenre !== "All" || selectedLanguage !== "All" || showAllMovies;
 
   const filteredAll = useMemo(() => {
-    let result = allMovies;
+    let result = validAllMovies;
     if (selectedGenre !== "All") {
       result = result.filter(m => m.genre?.toLowerCase().includes(selectedGenre.toLowerCase()));
     }
@@ -84,9 +101,9 @@ export default function MovieListClient({
       result = result.filter(m => m.language?.toLowerCase().includes(selectedLanguage.toLowerCase()));
     }
     return result;
-  }, [allMovies, selectedGenre, selectedLanguage]);
+  }, [validAllMovies, selectedGenre, selectedLanguage]);
 
-  const filteredRecommended = useMemo(() => recommended, [recommended]);
+  const filteredRecommended = useMemo(() => validRecommended, [validRecommended]);
   const visibleRecommended = showAllRecommended
     ? filteredRecommended
     : filteredRecommended.slice(0, INITIAL_SHOW);
@@ -152,7 +169,7 @@ export default function MovieListClient({
         {filteredAll.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
             {filteredAll.map((movie) => (
-              <MovieCard key={movie.id} movie={movie as any} />
+              <MovieCard key={movie.id} movie={movie as any} onImageError={handleImageError} />
             ))}
           </div>
         ) : (
@@ -187,13 +204,13 @@ export default function MovieListClient({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
           {visibleRecommended.map((movie) => (
-            <MovieCard key={movie.id} movie={movie as any} />
+            <MovieCard key={movie.id} movie={movie as any} onImageError={handleImageError} />
           ))}
         </div>
       </section>
 
-      <Section title="Trending" movies={trending} />
-      <Section title="Top Rated" movies={topRated} />
+      <Section title="Trending" movies={validTrending} onImageError={handleImageError} />
+      <Section title="Top Rated" movies={validTopRated} onImageError={handleImageError} />
 
     </div>
   );

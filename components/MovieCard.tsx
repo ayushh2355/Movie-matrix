@@ -10,10 +10,13 @@ function isValidCert(cert: string | null | undefined): cert is string {
   return !invalid.includes(cert.toLowerCase().trim());
 }
 
-export default function MovieCard({ movie }: { movie: Movie }) {
+export default function MovieCard({ movie, onImageError }: { movie: Movie, onImageError?: (id: string) => void }) {
   const [posterBroken, setPosterBroken] = useState(false);
 
-  if (!movie.posterUrl || posterBroken) return null;
+  const hasNoVotes = !movie.votes || movie.votes === "0" || movie.votes.toLowerCase() === "n/a";
+  const hasNoRating = !movie.rating || movie.rating === 0;
+
+  if (!movie.posterUrl || posterBroken || hasNoVotes || hasNoRating) return null;
 
   return (
     <div className="flex flex-col group">
@@ -21,7 +24,10 @@ export default function MovieCard({ movie }: { movie: Movie }) {
         src={movie.posterUrl}
         alt=""
         className="hidden"
-        onError={() => setPosterBroken(true)}
+        onError={() => {
+          setPosterBroken(true);
+          onImageError?.(movie.id);
+        }}
       />
 
       <Link
