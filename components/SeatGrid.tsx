@@ -25,7 +25,7 @@ type SeatGridProps = {
 export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId, showtimeId }: SeatGridProps) {
   const router = useRouter();
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const [booking, setBooking] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const seats: Seat[] = [];
   const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
@@ -73,28 +73,9 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
     else selectedTiersBreakdown.Gold += 1;
   });
 
-  const handleBooking = async () => {
+  const handleBooking = () => {
     if (selectedSeats.length === 0) return;
-    setBooking(true);
-    try {
-      const res = await fetch("/api/book", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ seatIds: selectedSeats, showtimeId, totalPrice }),
-      });
-
-      if (res.ok) {
-        toast.success("Booking Successful!");
-        setSelectedSeats([]);
-        router.refresh();
-      } else {
-        toast.error("Booking failed. Please try again.");
-      }
-    } catch {
-      toast.error("Booking failed. Please try again.");
-    } finally {
-      setBooking(false);
-    }
+    setShowConfirmModal(true);
   };
 
   const tiers = [
@@ -174,10 +155,76 @@ export default function SeatGrid({ bookedSeatIds, movieTitle, showTime, movieId,
           selectedSeatDetails={selectedSeatDetails}
           totalPrice={totalPrice}
           selectedTiersBreakdown={selectedTiersBreakdown}
-          booking={booking}
           handleBooking={handleBooking}
         />
       </div>
+
+      {/* Confirm Booking Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#161b22] border border-[#21262d] rounded-2xl w-full max-w-md p-6 shadow-2xl overflow-hidden relative">
+            <h2 className="text-xl font-bold text-white mb-6 text-center">Confirm Booking</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-semibold text-slate-200">{movieTitle}</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {new Date(showTime).toLocaleDateString("en-US", { month: "short", day: "numeric" })} • {new Date(showTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-2 font-bold">Selected Seats</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSeatDetails.map(seat => (
+                    <span key={seat.id} className="bg-amber-500/20 text-[#F5C518] border border-amber-500/30 px-2 py-0.5 rounded text-xs font-bold">
+                      {seat.row}{seat.col}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Category</p>
+                {Object.entries(selectedTiersBreakdown).map(([tierName, count]: any) => {
+                  if (count === 0) return null;
+                  const tierPrice = tierName === "Bronze" ? 200 : tierName === "Silver" ? 300 : 500;
+                  return (
+                    <div key={tierName} className="flex justify-between items-center text-sm">
+                      <span className="text-slate-300">{count} x {tierName} (₹{tierPrice}/seat)</span>
+                      <span className="text-slate-200 font-bold">₹{count * tierPrice}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="w-full h-px bg-slate-800/80 my-2" />
+
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-400 font-bold">Total Amount</span>
+                <span className="text-2xl font-black text-[#F5C518]">₹{totalPrice}</span>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              <button 
+                onClick={() => {
+                  router.push(`/payment?showtimeId=${showtimeId}&seats=${selectedSeats.join(",")}&amount=${totalPrice}`);
+                }}
+                className="w-full py-3 bg-[#F5C518] hover:bg-yellow-500 text-black font-bold rounded-full transition-colors"
+              >
+                Confirm & Pay
+              </button>
+              <button 
+                onClick={() => setShowConfirmModal(false)}
+                className="w-full py-3 bg-transparent border border-slate-700 hover:bg-slate-800 text-slate-300 font-bold rounded-full transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

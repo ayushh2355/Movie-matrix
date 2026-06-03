@@ -13,9 +13,10 @@ interface TicketCardProps {
       movie: { title: string; posterUrl: string | null; genre: string | null };
     } | null;
   };
+  hideCancelButton?: boolean;
 }
 
-export default function TicketCard({ booking }: TicketCardProps) {
+export default function TicketCard({ booking, hideCancelButton = false }: TicketCardProps) {
   const isCancelled = booking.status === "CANCELLED";
 
   return (
@@ -85,7 +86,7 @@ export default function TicketCard({ booking }: TicketCardProps) {
               Booked on {new Date(booking.createdAt).toLocaleDateString()}
             </p>
           </div>
-          {!isCancelled && <CancelTicketButton bookingId={booking.id} />}
+          {!isCancelled && !hideCancelButton && <CancelTicketButton bookingId={booking.id} />}
         </div>
       </div>
 

@@ -14,6 +14,7 @@ export default function CancelTicketButton({ bookingId }: CancelTicketButtonProp
   const router = useRouter();
 
   const handleCancel = async () => {
+     if (isCancelling) return;
     setIsCancelling(true);
 
     try {
@@ -31,10 +32,13 @@ export default function CancelTicketButton({ bookingId }: CancelTicketButtonProp
         toast.error(data.error || "Failed to cancel booking");
       }
     } catch (error) {
-      toast.error("An error occurred while cancelling");
+      if (!navigator.onLine) {
+    toast.error("No internet connection");
+    } else {
+    toast.error("Server error, please try again");
+    }
     } finally {
       setIsCancelling(false);
-      setShowConfirm(false);
     }
   };
 

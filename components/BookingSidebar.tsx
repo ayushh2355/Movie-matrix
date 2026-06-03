@@ -8,7 +8,6 @@ interface BookingSidebarProps {
   selectedSeatDetails: Seat[];
   totalPrice: number;
   selectedTiersBreakdown: any;
-  booking: boolean;
   handleBooking: () => void;
 }
 
@@ -21,7 +20,6 @@ export default function BookingSidebar({
   selectedSeatDetails,
   totalPrice,
   selectedTiersBreakdown,
-  booking,
   handleBooking,
 }: BookingSidebarProps) {
 
@@ -35,7 +33,7 @@ export default function BookingSidebar({
   };
 
   const isOverLimit = selectedSeats.length > MAX_SEATS;
-  const canBook = selectedSeats.length > 0 && selectedSeats.length <= MAX_SEATS && !booking;
+  const canBook = selectedSeats.length > 0 && selectedSeats.length <= MAX_SEATS;
 
   const baseClasses = "w-full py-3 rounded-xl font-black text-xs shadow-md transition-all duration-150 select-none uppercase tracking-wider border";
   const activeClasses = "bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 border-amber-400/30 hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] active:scale-[0.98] cursor-pointer";
@@ -129,7 +127,7 @@ export default function BookingSidebar({
           onClick={handleBooking}
           className={buttonClasses}
         >
-          {booking ? "Booking..." : isOverLimit ? `Max ${MAX_SEATS} seats allowed` : "Book Now"}
+          {isOverLimit ? `Max ${MAX_SEATS} seats allowed` : "Book Now"}
         </button>
       </div>
 

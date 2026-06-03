@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import BookButton from "@/components/BookButton";
 type Props = {
   params: Promise<{ id: string }>;
 };
@@ -73,12 +74,7 @@ export default async function MoviePage(props: Props) {
                     <span className="text-4xl font-black text-slate-50 mb-10 text-center tracking-wide">
                       {new Date(st.datetime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                     </span>
-                    <Link 
-                      href={`/showtime/${st.id}`}
-                      className="w-full text-center bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black tracking-widest uppercase px-6 py-3.5 rounded-full transition-all shadow-[0_0_25px_rgba(245,158,11,0.25)] hover:shadow-[0_0_35px_rgba(245,158,11,0.5)] active:scale-95"
-                    >
-                      Book
-                    </Link>
+                    <BookButton showtimeId={st.id} />
                   </div>
                 ))}
               </div>
