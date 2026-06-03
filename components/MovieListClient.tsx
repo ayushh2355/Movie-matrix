@@ -57,7 +57,7 @@ function Section({ title, movies }: { title: string; movies: Movie[] }) {
 }
 
 const ALLOWED_GENRES = ["Action", "Comedy", "Drama", "Sci-Fi", "Romance", "Thriller", "Horror", "Adventure"];
-const ALLOWED_LANGUAGES = ["Hindi", "Telugu", "Tamil", "Malayalam", "Kannada", "English"];
+const ALLOWED_LANGUAGES = ["Hindi", "Telugu", "Tamil", "English"];
 
 export default function MovieListClient({
   allMovies,
